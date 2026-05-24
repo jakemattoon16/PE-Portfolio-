@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PE Portfolio Financial Operations Benchmark | Corelytics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --neon: #818cf8;
+      --neon-bright: #a5b4fc;
+      --neon-dim: #6366f1;
+      --bg-deep: #06070f;
+      --bg-card: #0c0d1a;
+      --bg-card2: #101225;
+      --border-neon: rgba(129, 140, 248, 0.3);
+      --border-neon-strong: rgba(129, 140, 248, 0.7);
+      --border-neon-subtle: rgba(129, 140, 248, 0.15);
+    }
+    body { background-color: var(--bg-deep); font-family: 'Inter', sans-serif; }
+    .neon-text { color: var(--neon); }
+    .neon-text-bright { color: var(--neon-bright); }
+    .neon-border { border: 1px solid var(--border-neon); }
+    .neon-border-strong { border: 1px solid var(--border-neon-strong); }
+    .neon-glow { box-shadow: 0 0 40px rgba(129, 140, 248, 0.12); }
+    .gradient-hero { background: radial-gradient(ellipse at 50% -10%, rgba(99, 102, 241, 0.12) 0%, transparent 55%); }
+    .gradient-card { background: linear-gradient(145deg, rgba(16, 18, 37, 0.95) 0%, rgba(12, 13, 26, 0.98) 100%); }
+    .badge-pill { background: rgba(99, 102, 241, 0.1); border: 1px solid rgba(129, 140, 248, 0.35); color: var(--neon-bright); }
+    .stat-card { background: rgba(12, 13, 26, 0.8); border: 1px solid rgba(129, 140, 248, 0.15); }
+    .form-input { background: rgba(6, 7, 15, 0.95); border: 1px solid rgba(129, 140, 248, 0.25); color: #e2e8f0; }
+    .form-input:focus { outline: none; border-color: rgba(129, 140, 248, 0.7); box-shadow: 0 0 15px rgba(129, 140, 248, 0.1); }
+    .form-input::placeholder { color: #3a3d52; }
+    .cta-btn { background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%); color: #ffffff; }
+    .cta-btn:hover { background: linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%); transform: translateY(-1px); box-shadow: 0 8px 30px rgba(99, 102, 241, 0.35); }
+    .erp-badge { background: rgba(16, 18, 37, 0.8); border: 1px solid rgba(129, 140, 248, 0.18); }
+    select option { background: #0c0d1a; color: #e2e8f0; }
+    .covenant-bar-bg { background: rgba(129, 140, 248, 0.1); border: 1px solid rgba(129, 140, 248, 0.2); }
+    .covenant-bar-fill { background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%); }
+    .covenant-bar-danger { background: linear-gradient(90deg, #818cf8 60%, #ef4444 100%); }
+    .alert-red { background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-left: 3px solid #ef4444; }
+    .alert-green { background: rgba(129, 140, 248, 0.06); border: 1px solid rgba(129, 140, 248, 0.25); border-left: 3px solid var(--neon); }
+    .portfolio-row { border-bottom: 1px solid rgba(129, 140, 248, 0.08); }
+    .status-ok { background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); color: #86efac; }
+    .status-warn { background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); color: #fde68a; }
+    .status-crit { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; }
+    .bench-table-header { border-bottom: 1px solid rgba(129, 140, 248, 0.12); }
+    .bench-row { border-bottom: 1px solid rgba(129, 140, 248, 0.08); }
+  </style>
+</head>
+<body class="text-slate-200 min-h-screen antialiased">
+
+  <!-- Nav -->
+  <nav class="fixed top-0 left-0 right-0 z-50 backdrop-blur-md" style="background: rgba(6,7,15,0.97); border-bottom: 1px solid rgba(129,140,248,0.1);">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-md neon-border flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2">
+            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+          </svg>
+        </div>
+        <span class="text-white font-bold text-lg tracking-tight">Corelytics</span>
+        <span class="text-xs text-slate-500 font-medium ml-1 hidden sm:block">Portfolio Intelligence</span>
+      </div>
+      <a href="#form" class="cta-btn text-sm font-bold px-5 py-2 rounded-lg transition-all duration-200 cursor-pointer inline-block">Request Portfolio Grid</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="gradient-hero pt-32 pb-20 px-6 relative overflow-hidden">
+    <div class="max-w-5xl mx-auto text-center relative z-10">
+      <div class="badge-pill inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-8">
+        <span class="w-2 h-2 rounded-full bg-current animate-pulse"></span>
+        For PE Operating Partners and Portfolio CFOs
+      </div>
+
+      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight mb-6">
+        Stop Relying on<br class="hidden sm:block" />
+        Lagging <span class="neon-text-bright">EBITDA Snapshots.</span>
+      </h1>
+      <p class="text-xl sm:text-2xl font-semibold text-slate-300 mb-5">
+        Real-Time Cross-Portfolio Financial Visibility is Now Automated.
+      </p>
+      <p class="text-base sm:text-lg text-slate-400 max-w-3xl mx-auto mb-12 leading-relaxed">
+        An Operating Partner overseeing four portfolio companies cannot have four different reporting cadences, four different ERP environments, and a 30-to-45-day lag before covenant breaches, EBITDA bridge variances, and cash anomalies surface. Corelytics delivers a unified daily intelligence layer across your entire portfolio without requiring you to log into any of them.
+      </p>
+
+      <!-- Simulated Portfolio Dashboard Preview -->
+      <div class="max-w-4xl mx-auto mb-12 gradient-card rounded-2xl neon-border p-6 text-left">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <p class="text-xs text-slate-500 font-semibold uppercase tracking-widest mb-1">Corelytics CompanyPulse</p>
+            <h3 class="text-white font-bold text-lg">Portfolio Morning Briefing</h3>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+            <span class="text-xs text-green-400 font-semibold">Live as of 6:47 AM</span>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <!-- Company 1 -->
+          <div class="portfolio-row flex flex-col sm:flex-row sm:items-center gap-3 pb-3">
+            <div class="w-36 flex-shrink-0">
+              <p class="text-slate-300 text-sm font-semibold">Platform A</p>
+              <p class="text-slate-600 text-xs">Industrial Mfg.</p>
+            </div>
+            <div class="flex-1 grid grid-cols-3 gap-3 text-xs">
+              <div><p class="text-slate-500 mb-0.5">Revenue MTD</p><p class="text-slate-200 font-semibold">$4.2M <span class="text-green-400">+3.1%</span></p></div>
+              <div><p class="text-slate-500 mb-0.5">Gross Margin</p><p class="text-slate-200 font-semibold">38.2% <span class="text-yellow-400">-0.8pts</span></p></div>
+              <div><p class="text-slate-500 mb-0.5">DSO (Rolling)</p><p class="text-slate-200 font-semibold">52 days</p></div>
+            </div>
+            <div class="flex-shrink-0"><span class="status-ok text-xs font-semibold px-3 py-1 rounded-full">Within Covenant</span></div>
+          </div>
+
+          <!-- Company 2 - Warning -->
+          <div class="portfolio-row flex flex-col sm:flex-row sm:items-center gap-3 pb-3">
+            <div class="w-36 flex-shrink-0">
+              <p class="text-slate-300 text-sm font-semibold">Platform B</p>
+              <p class="text-slate-600 text-xs">Business Services</p>
+            </div>
+            <div class="flex-1 grid grid-cols-3 gap-3 text-xs">
+              <div><p class="text-slate-500 mb-0.5">Revenue MTD</p><p class="text-slate-200 font-semibold">$1.9M <span class="text-red-400">-6.2%</span></p></div>
+              <div><p class="text-slate-500 mb-0.5">EBITDA vs Bridge</p><p class="text-slate-200 font-semibold"><span class="text-red-400">-$180K</span></p></div>
+              <div><p class="text-slate-500 mb-0.5">Leverage Ratio</p><p class="text-yellow-300 font-bold">3.9x / 4.0x limit</p></div>
+            </div>
+            <div class="flex-shrink-0"><span class="status-crit text-xs font-semibold px-3 py-1 rounded-full">Alert: Covenant Risk</span></div>
+          </div>
+
+          <!-- Leverage bar -->
+          <div class="alert-red rounded-xl p-4 mt-1">
+            <p class="text-xs text-red-300 font-semibold mb-2">Corelytics Automated Risk Detection: Platform B leverage approaching hard limit</p>
+            <div class="covenant-bar-bg rounded-full h-3 w-full overflow-hidden">
+              <div class="covenant-bar-danger h-full rounded-full" style="width: 97.5%;"></div>
+            </div>
+            <div class="flex justify-between mt-1.5">
+              <span class="text-xs text-slate-500">0x</span>
+              <span class="text-xs text-red-400 font-semibold">Current: 3.9x</span>
+              <span class="text-xs text-slate-500">Hard Limit: 4.0x</span>
+            </div>
+          </div>
+
+          <!-- Company 3 -->
+          <div class="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+            <div class="w-36 flex-shrink-0">
+              <p class="text-slate-300 text-sm font-semibold">Platform C</p>
+              <p class="text-slate-600 text-xs">Specialty Dist.</p>
+            </div>
+            <div class="flex-1 grid grid-cols-3 gap-3 text-xs">
+              <div><p class="text-slate-500 mb-0.5">Cash Position</p><p class="text-slate-200 font-semibold">$2.1M</p></div>
+              <div><p class="text-slate-500 mb-0.5">Inventory DOH</p><p class="text-slate-200 font-semibold">71 days</p></div>
+              <div><p class="text-slate-500 mb-0.5">AR 60+ Days</p><p class="text-yellow-300 font-semibold">18.4% <span class="text-yellow-400">+4.1%</span></p></div>
+            </div>
+            <div class="flex-shrink-0"><span class="status-warn text-xs font-semibold px-3 py-1 rounded-full">Watch: AR Aging</span></div>
+          </div>
+        </div>
+      </div>
+
+      <a href="#form" class="cta-btn inline-block font-bold text-lg px-10 py-4 rounded-xl transition-all duration-200 cursor-pointer">
+        Request the Portfolio Operations Grid
+      </a>
+      <p class="text-sm text-slate-600 mt-4">Built for Operating Partners managing 2 to 10 portfolio companies across multiple ERP environments.</p>
+    </div>
+  </section>
+
+  <!-- The PE Problem -->
+  <section class="py-20 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <p class="text-xs font-semibold tracking-widest text-slate-500 uppercase mb-4">The Structural Problem</p>
+        <h2 class="text-3xl sm:text-4xl font-black text-white mb-5">The Reporting Lag That Destroys Exit Multiples</h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-base leading-relaxed">
+          A PE-backed business has a 3-to-7-year holding period. Every quarter of underperformance against the investment model compounds the gap between current trajectory and exit multiple target. The reporting infrastructure at most portfolio companies is not built to close that gap.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="gradient-card rounded-2xl p-7 neon-border">
+          <div class="text-4xl font-black neon-text-bright mb-3">30 days</div>
+          <h3 class="text-white font-bold text-base mb-3">Covenant Blind Window</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Lenders test covenants at month-end. A company drifting toward a leverage breach has a 30-day blind spot before the breach is formally identified. A 3.9x ratio against a 4.0x hard limit needs a daily signal, not a monthly one.</p>
+        </div>
+        <div class="gradient-card rounded-2xl p-7 neon-border">
+          <div class="text-4xl font-black neon-text-bright mb-3">45 days</div>
+          <h3 class="text-white font-bold text-base mb-3">EBITDA Variance Discovery Lag</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">A $2M EBITDA bridge variance that takes 45 days to surface is a variance that has been compounding for 45 days. Leadership cannot mount a corrective response when the signal arrives this late. They can only explain the miss in retrospect.</p>
+        </div>
+        <div class="gradient-card rounded-2xl p-7 neon-border">
+          <div class="text-4xl font-black neon-text-bright mb-3">4 logins</div>
+          <h3 class="text-white font-bold text-base mb-3">Per-Company ERP Overhead</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">An Operating Partner with four portfolio companies is logging into four ERP environments, running four different export sequences, and reviewing four different report formats to compile a picture that should already exist as a unified daily briefing.</p>
+        </div>
+      </div>
+
+      <!-- Covenant Tracking Detail -->
+      <div class="gradient-card rounded-2xl p-8 neon-border-strong neon-glow">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div>
+            <h3 class="text-white font-bold text-xl mb-4">The Covenant Breach That Was Entirely Predictable</h3>
+            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+              Most covenant breaches in PE portfolio companies are not sudden. They are the terminal outcome of a trend that was visible in the operational data for 30 to 60 days before the breach date. A company running at 3.8x leverage in month one, 3.85x in month two, and 3.9x in month three does not need to wait for month four to discover it is breaching at 4.05x.
+            </p>
+            <p class="text-slate-400 text-sm leading-relaxed">
+              Corelytics Automated Risk Detection monitors every tracked ratio on a daily basis. When a metric crosses a predefined warning threshold, an alert fires to the Operating Partner and portfolio CFO. The corrective window is measured in weeks, not discovered in a lender call.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-xs mb-2">
+                <span class="text-slate-400 font-medium">Total Leverage Ratio</span>
+                <span class="text-yellow-300 font-bold">3.9x current / 4.0x hard limit</span>
+              </div>
+              <div class="covenant-bar-bg rounded-full h-3 overflow-hidden">
+                <div class="covenant-bar-danger h-full rounded-full" style="width: 97.5%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-2">
+                <span class="text-slate-400 font-medium">Interest Coverage Ratio</span>
+                <span class="text-green-400 font-bold">3.2x current / 2.5x floor</span>
+              </div>
+              <div class="covenant-bar-bg rounded-full h-3 overflow-hidden">
+                <div class="covenant-bar-fill h-full rounded-full" style="width: 55%;"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-2">
+                <span class="text-slate-400 font-medium">Minimum EBITDA (Trailing 12M)</span>
+                <span class="text-yellow-300 font-bold">$4.1M current / $4.0M floor</span>
+              </div>
+              <div class="covenant-bar-bg rounded-full h-3 overflow-hidden">
+                <div class="covenant-bar-fill h-full rounded-full" style="width: 71%;"></div>
+              </div>
+            </div>
+            <p class="text-xs text-slate-600 italic">Illustrative Corelytics Automated Risk Detection dashboard output</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Platform Features for PE -->
+  <section class="py-20 px-6" style="background: radial-gradient(ellipse at center, rgba(99,102,241,0.05) 0%, transparent 65%);">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <p class="text-xs font-semibold tracking-widest text-slate-500 uppercase mb-4">Corelytics for PE Operations</p>
+        <h2 class="text-3xl sm:text-4xl font-black text-white mb-5">Built for the Operating Partner Workflow</h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-base leading-relaxed">
+          Corelytics integrates directly with the ERP environments your portfolio companies already run. The result is a unified intelligence layer that replaces the four-system morning login routine with a single daily briefing across all entities.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <div class="gradient-card rounded-2xl p-7 neon-border">
+          <div class="w-12 h-12 rounded-xl neon-border mb-5 flex items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.5">
+              <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+            </svg>
+          </div>
+          <h3 class="text-white font-bold text-lg mb-3">Corelytics CompanyPulse</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">A unified daily briefing delivered across all portfolio companies before 7am. Revenue trends, cash positions, AR aging movement, EBITDA versus bridge, and any triggered risk alerts. One email. All companies. No logins.</p>
+          <div class="alert-green rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
+            For an Operating Partner overseeing four portfolio companies, CompanyPulse replaces four separate reporting workflows with a single daily intelligence feed. The time savings alone justify the evaluation.
+          </div>
+        </div>
+
+        <div class="gradient-card rounded-2xl p-7 neon-border">
+          <div class="w-12 h-12 rounded-xl neon-border mb-5 flex items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.5">
+              <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+          </div>
+          <h3 class="text-white font-bold text-lg mb-3">Corelytics Automated Risk Detection</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">Continuous threshold monitoring across all portfolio entities simultaneously. Leverage ratios, interest coverage, minimum EBITDA, DSO, and custom operational metrics all monitored against defined thresholds with immediate alerts when approached or breached.</p>
+          <div class="alert-green rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
+            Alerts fire the moment a metric crosses a warning threshold, not at month-end when the breach has already occurred. The corrective window is measured in days, not discovered in a lender call.
+          </div>
+        </div>
+
+        <div class="gradient-card rounded-2xl p-7 neon-border">
+          <div class="w-12 h-12 rounded-xl neon-border mb-5 flex items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.5">
+              <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+          <h3 class="text-white font-bold text-lg mb-3">Corelytics Scenario Modeling</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">EBITDA bridge sensitivity analysis connected to live operational data. Model the EBITDA impact of a DSO compression initiative, a pricing increase, or a headcount rationalization before the initiative is authorized. Prioritize value creation levers with data, not intuition.</p>
+          <div class="alert-green rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
+            A portfolio company performing at the 40th NAICS percentile on DSO has a quantifiable improvement opportunity. Scenario Modeling shows the EBITDA and cash impact of closing that gap before the initiative begins.
+          </div>
+        </div>
+
+        <div class="gradient-card rounded-2xl p-7 neon-border">
+          <div class="w-12 h-12 rounded-xl neon-border mb-5 flex items-center justify-center">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+            </svg>
+          </div>
+          <h3 class="text-white font-bold text-lg mb-3">NAICS Sub-Group Benchmarking</h3>
+          <p class="text-slate-400 text-sm leading-relaxed mb-4">Benchmarks at the NAICS industry sub-group level within your portfolio company's specific revenue band. Not generic industry averages. Not cross-size comparisons. Peer-accurate benchmarks that tell you whether underperformance on DSO, margin, or inventory turn is a relative problem or an industry-wide condition.</p>
+          <div class="alert-green rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
+            An Operating Partner who can rank each portfolio company by percentile performance across five operational metrics has a prioritized value creation roadmap that a generic benchmark report cannot provide.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Three Questions -->
+  <section class="py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-14">
+        <h2 class="text-3xl sm:text-4xl font-black text-white mb-5">Three Questions Every Operating Partner Needs Answered Daily</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="gradient-card rounded-2xl p-7 neon-border text-center">
+          <div class="w-14 h-14 rounded-full neon-border mx-auto mb-5 flex items-center justify-center">
+            <span class="neon-text-bright font-black text-xl">1</span>
+          </div>
+          <h3 class="text-white font-bold text-base mb-3">Which company needs attention today?</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Corelytics CompanyPulse surfaces the one or two companies in your portfolio that require active attention each morning, based on live operational signals rather than a calendar-driven review schedule.</p>
+        </div>
+        <div class="gradient-card rounded-2xl p-7 neon-border text-center">
+          <div class="w-14 h-14 rounded-full neon-border mx-auto mb-5 flex items-center justify-center">
+            <span class="neon-text-bright font-black text-xl">2</span>
+          </div>
+          <h3 class="text-white font-bold text-base mb-3">Are we approaching any covenant thresholds?</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">Corelytics Automated Risk Detection monitors every financial covenant across every portfolio company simultaneously. You know before the lender does.</p>
+        </div>
+        <div class="gradient-card rounded-2xl p-7 neon-border text-center">
+          <div class="w-14 h-14 rounded-full neon-border mx-auto mb-5 flex items-center justify-center">
+            <span class="neon-text-bright font-black text-xl">3</span>
+          </div>
+          <h3 class="text-white font-bold text-base mb-3">What is the highest-ROI value creation lever right now?</h3>
+          <p class="text-slate-400 text-sm leading-relaxed">NAICS benchmarking combined with Corelytics Scenario Modeling identifies the gap between current performance and peer percentile, and quantifies the EBITDA impact of closing it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Integration Badges -->
+  <section class="py-14 px-6">
+    <div class="max-w-6xl mx-auto">
+      <p class="text-center text-xs font-semibold tracking-widest text-slate-500 uppercase mb-4">Works With Every ERP in Your Portfolio Stack</p>
+      <p class="text-center text-sm text-slate-500 mb-10">No requirement for portfolio companies to migrate or change systems. Corelytics integrates with what they already run.</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">MS Dynamics 365</div>
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">Acumatica</div>
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">Infor M3 / M4</div>
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">Sage 100 / 300</div>
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">Vista by Viewpoint</div>
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">QuickBooks Enterprise</div>
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">QuickBooks Desktop</div>
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">QuickBooks Online</div>
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">Salesforce</div>
+        <div class="erp-badge px-4 py-2.5 rounded-lg text-slate-300 text-sm font-medium">BambooHR</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benchmark Grid Preview -->
+  <section class="py-16 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <p class="text-xs font-semibold tracking-widest text-slate-500 uppercase mb-4">What You Receive</p>
+        <h2 class="text-3xl sm:text-4xl font-black text-white mb-5">The Portfolio Operations Grid</h2>
+        <p class="text-slate-400 max-w-2xl mx-auto text-base">A two-page benchmark and operational readiness document covering five key financial metrics across three PE-relevant industry sectors, with percentile distribution and EBITDA impact modeling per metric.</p>
+      </div>
+
+      <div class="gradient-card rounded-2xl neon-border overflow-hidden">
+        <div class="px-6 py-4 bench-table-header">
+          <div class="grid grid-cols-6 gap-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <div class="col-span-2">Metric</div>
+            <div class="text-center">P25</div>
+            <div class="text-center">P50</div>
+            <div class="text-center">P75</div>
+            <div class="text-center">P90</div>
+          </div>
+        </div>
+        <div class="px-6 py-4 bench-row">
+          <div class="grid grid-cols-6 gap-4 items-center">
+            <div class="col-span-2 text-slate-300 text-sm font-medium">Days Sales Outstanding (DSO)</div>
+            <div class="text-center text-red-400 text-sm font-semibold">68 days</div>
+            <div class="text-center text-yellow-400 text-sm font-semibold">52 days</div>
+            <div class="text-center text-sm font-semibold" style="color:#a5b4fc">41 days</div>
+            <div class="text-center text-green-400 text-sm font-semibold">33 days</div>
+          </div>
+        </div>
+        <div class="px-6 py-4 bench-row">
+          <div class="grid grid-cols-6 gap-4 items-center">
+            <div class="col-span-2 text-slate-300 text-sm font-medium">Gross Margin (Mfg, $25M-$75M)</div>
+            <div class="text-center text-red-400 text-sm font-semibold">29.4%</div>
+            <div class="text-center text-yellow-400 text-sm font-semibold">35.1%</div>
+            <div class="text-center text-sm font-semibold" style="color:#a5b4fc">40.8%</div>
+            <div class="text-center text-green-400 text-sm font-semibold">46.2%</div>
+          </div>
+        </div>
+        <div class="px-6 py-4 bench-row">
+          <div class="grid grid-cols-6 gap-4 items-center">
+            <div class="col-span-2 text-slate-300 text-sm font-medium">EBITDA Margin vs Leverage</div>
+            <div class="text-center text-red-400 text-sm font-semibold">8.2%</div>
+            <div class="text-center text-yellow-400 text-sm font-semibold">11.5%</div>
+            <div class="text-center text-sm font-semibold" style="color:#a5b4fc">14.7%</div>
+            <div class="text-center text-green-400 text-sm font-semibold">18.1%</div>
+          </div>
+        </div>
+        <div class="px-6 py-4 bench-row">
+          <div class="grid grid-cols-6 gap-4 items-center">
+            <div class="col-span-2 text-slate-300 text-sm font-medium">Month-End Close Duration</div>
+            <div class="text-center text-red-400 text-sm font-semibold">14 days</div>
+            <div class="text-center text-yellow-400 text-sm font-semibold">10 days</div>
+            <div class="text-center text-sm font-semibold" style="color:#a5b4fc">7 days</div>
+            <div class="text-center text-green-400 text-sm font-semibold">5 days</div>
+          </div>
+        </div>
+        <div class="px-6 py-4 bench-row">
+          <div class="grid grid-cols-6 gap-4 items-center">
+            <div class="col-span-2 text-slate-300 text-sm font-medium">Inventory Days-on-Hand</div>
+            <div class="text-center text-red-400 text-sm font-semibold">88 days</div>
+            <div class="text-center text-yellow-400 text-sm font-semibold">65 days</div>
+            <div class="text-center text-sm font-semibold" style="color:#a5b4fc">48 days</div>
+            <div class="text-center text-green-400 text-sm font-semibold">35 days</div>
+          </div>
+        </div>
+        <div class="px-6 py-4">
+          <p class="text-xs text-slate-600 italic">Illustrative benchmark data. Full Portfolio Operations Grid includes NAICS sub-group segmentation and revenue-band filtering. Delivered in PDF format with Corelytics integration map.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Form -->
+  <section id="form" class="py-20 px-6">
+    <div class="max-w-2xl mx-auto">
+      <div class="gradient-card rounded-3xl p-8 sm:p-12 neon-border-strong neon-glow">
+        <div class="text-center mb-10">
+          <div class="badge-pill inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+            <span class="w-2 h-2 rounded-full bg-current"></span>
+            PE Portfolio Operations Grid
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white mb-4">Request the Portfolio Operations Grid</h2>
+          <p class="text-slate-400 text-sm leading-relaxed">
+            Includes NAICS sub-group benchmarks for five core financial metrics, percentile distribution across three PE-relevant sectors, a portfolio readiness matrix, and a Corelytics integration path for your portfolio's current ERP stack.
+          </p>
+        </div>
+
+        <form class="space-y-5" onsubmit="return false;">
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Full Name</label>
+            <input type="text" placeholder="Sam Mitchell" class="form-input w-full px-4 py-3.5 rounded-xl text-sm transition-all duration-200" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Work Email</label>
+            <input type="email" placeholder="sam@firmname.com" class="form-input w-full px-4 py-3.5 rounded-xl text-sm transition-all duration-200" />
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Primary ERP in Your Portfolio</label>
+            <select class="form-input w-full px-4 py-3.5 rounded-xl text-sm transition-all duration-200 cursor-pointer">
+              <option value="" disabled selected>Select the most common ERP across your portfolio</option>
+              <option>MS Dynamics 365</option>
+              <option>Acumatica</option>
+              <option>Infor M3 / M4</option>
+              <option>Sage 100</option>
+              <option>Sage 300</option>
+              <option>Vista by Viewpoint</option>
+              <option>QuickBooks Enterprise</option>
+              <option>QuickBooks Desktop</option>
+              <option>QuickBooks Online</option>
+              <option>Mixed / Multiple Systems</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <button type="submit" class="cta-btn w-full font-bold text-base py-4 rounded-xl transition-all duration-200 cursor-pointer mt-2">
+            Request the Portfolio Operations Grid
+          </button>
+          <p class="text-xs text-slate-600 text-center">
+            A Corelytics portfolio specialist will follow up with the Grid and a briefing tailored to your portfolio's current ERP and sector composition.
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-10 px-6" style="border-top: 1px solid rgba(129,140,248,0.08);">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded neon-border flex items-center justify-center">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2">
+            <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/>
+          </svg>
+        </div>
+        <span class="text-slate-400 text-sm font-medium">Corelytics Financial Intelligence</span>
+      </div>
+      <p class="text-slate-600 text-xs">2026 Corelytics. Built for PE Operating Partners and portfolio CFOs managing multi-entity environments.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
